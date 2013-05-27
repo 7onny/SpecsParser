@@ -1,0 +1,56 @@
+MODULE main
+VAR
+	NS : boolean;
+	EW : boolean;
+	NSlite : {green, yellow, red};
+	EWlite : {green, yellow, red};
+	NSreq : boolean;
+	EWreq : boolean;
+
+ASSIGN 
+	init(NSlite):=green;
+	init(EWlite):=red;
+	init(NSreq):=FALSE;
+	init(EWreq):=FALSE;
+	next(NSlite):=
+		case
+			NSlite=red & EWlite=yellow				: green;
+			NSlite=green & EWreq=TRUE 				: yellow;
+			NSlite=green & EWreq=FALSE & EW=TRUE	: yellow;  
+			NSlite=yellow 							: red;
+			TRUE									: NSlite;
+		esac;
+	next(EWlite):=
+		case
+			EWlite=red & NSlite=yellow				: green;
+			EWlite=green & NSreq=TRUE 				: yellow;
+			EWlite=green & NSreq=FALSE & NS=TRUE	: yellow;
+			EWlite=yellow							: red;
+			TRUE									: EWlite;
+		esac;
+	next(NSreq):=
+		case
+			NSlite=red & NS=TRUE & NSreq=FALSE		: TRUE;
+			NSlite=yellow & NS=TRUE					: TRUE;
+			NSlite=red & EWlite=yellow & NSreq=TRUE : FALSE;
+			TRUE									: NSreq;
+		esac;
+	next(EWreq):=
+		case
+			EWlite=red & EW=TRUE & EWreq=FALSE		: TRUE;
+			EWlite=yellow & EW=TRUE					: TRUE;
+			EWlite=red & NSlite=yellow & EWreq=TRUE	: FALSE;
+			TRUE									: EWreq;
+		esac;
+
+
+SPEC AG (NSlite=EWlite)
+SPEC AG ((NSlite=green & EW=TRUE) -> AX NSlite!=yellow)
+SPEC AG ((EWlite=green & NS=TRUE) -> AX EWlite!=yellow)
+SPEC AG (NSlite=yellow -> AX NSlite!=red)
+SPEC AG (EWlite=yellow -> AX EWlite!=red)
+SPEC AG ((NSlite=red & EWlite=yellow) -> AX NSlite!=green)
+SPEC AG ((EWlite=red & NSlite=yellow) -> AX EWlite!=green)
+SPEC AG (NS=TRUE -> AG NSlite!=green)
+SPEC AG (EW=TRUE -> AG EWlite!=green)
+

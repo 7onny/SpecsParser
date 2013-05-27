@@ -1,0 +1,192 @@
+-- specification AG NSlite = EWlite  is false
+-- as demonstrated by the following execution sequence
+Trace Description: CTL Counterexample 
+Trace Type: Counterexample 
+-> State: 3.1 <-
+  NS = FALSE
+  EW = FALSE
+  NSlite = green
+  EWlite = red
+  NSreq = FALSE
+  EWreq = FALSE
+-- specification AG ((NSlite = green & EW = TRUE) -> AX NSlite != yellow)  is false
+-- as demonstrated by the following execution sequence
+Trace Description: CTL Counterexample 
+Trace Type: Counterexample 
+-> State: 4.1 <-
+  NS = FALSE
+  EW = FALSE
+  NSlite = green
+  EWlite = red
+  NSreq = FALSE
+  EWreq = FALSE
+-> State: 4.2 <-
+  EW = TRUE
+-> State: 4.3 <-
+  EW = FALSE
+  NSlite = yellow
+  EWreq = TRUE
+-- specification AG ((EWlite = green & NS = TRUE) -> AX EWlite != yellow)  is false
+-- as demonstrated by the following execution sequence
+Trace Description: CTL Counterexample 
+Trace Type: Counterexample 
+-> State: 5.1 <-
+  NS = FALSE
+  EW = FALSE
+  NSlite = green
+  EWlite = red
+  NSreq = FALSE
+  EWreq = FALSE
+-> State: 5.2 <-
+  EW = TRUE
+-> State: 5.3 <-
+  EW = FALSE
+  NSlite = yellow
+  EWreq = TRUE
+-> State: 5.4 <-
+  NS = TRUE
+  NSlite = red
+  EWlite = green
+  EWreq = FALSE
+-> State: 5.5 <-
+  NS = FALSE
+  EWlite = yellow
+  NSreq = TRUE
+-- specification AG (NSlite = yellow -> AX NSlite != red)  is false
+-- as demonstrated by the following execution sequence
+Trace Description: CTL Counterexample 
+Trace Type: Counterexample 
+-> State: 6.1 <-
+  NS = FALSE
+  EW = FALSE
+  NSlite = green
+  EWlite = red
+  NSreq = FALSE
+  EWreq = FALSE
+-> State: 6.2 <-
+  EW = TRUE
+-> State: 6.3 <-
+  EW = FALSE
+  NSlite = yellow
+  EWreq = TRUE
+-> State: 6.4 <-
+  NSlite = red
+  EWlite = green
+  EWreq = FALSE
+-- specification AG (EWlite = yellow -> AX EWlite != red)  is false
+-- as demonstrated by the following execution sequence
+Trace Description: CTL Counterexample 
+Trace Type: Counterexample 
+-- Loop starts here
+-> State: 7.1 <-
+  NS = FALSE
+  EW = FALSE
+  NSlite = green
+  EWlite = red
+  NSreq = FALSE
+  EWreq = FALSE
+-> State: 7.2 <-
+  EW = TRUE
+-> State: 7.3 <-
+  EW = FALSE
+  NSlite = yellow
+  EWreq = TRUE
+-> State: 7.4 <-
+  NS = TRUE
+  NSlite = red
+  EWlite = green
+  EWreq = FALSE
+-> State: 7.5 <-
+  NS = FALSE
+  EWlite = yellow
+  NSreq = TRUE
+-> State: 7.6 <-
+  NSlite = green
+  EWlite = red
+  NSreq = FALSE
+-- specification AG ((NSlite = red & EWlite = yellow) -> AX NSlite != green)  is false
+-- as demonstrated by the following execution sequence
+Trace Description: CTL Counterexample 
+Trace Type: Counterexample 
+-- Loop starts here
+-> State: 8.1 <-
+  NS = FALSE
+  EW = FALSE
+  NSlite = green
+  EWlite = red
+  NSreq = FALSE
+  EWreq = FALSE
+-> State: 8.2 <-
+  EW = TRUE
+-> State: 8.3 <-
+  EW = FALSE
+  NSlite = yellow
+  EWreq = TRUE
+-> State: 8.4 <-
+  NS = TRUE
+  NSlite = red
+  EWlite = green
+  EWreq = FALSE
+-> State: 8.5 <-
+  NS = FALSE
+  EWlite = yellow
+  NSreq = TRUE
+-> State: 8.6 <-
+  NSlite = green
+  EWlite = red
+  NSreq = FALSE
+-- specification AG ((EWlite = red & NSlite = yellow) -> AX EWlite != green)  is false
+-- as demonstrated by the following execution sequence
+Trace Description: CTL Counterexample 
+Trace Type: Counterexample 
+-> State: 9.1 <-
+  NS = FALSE
+  EW = FALSE
+  NSlite = green
+  EWlite = red
+  NSreq = FALSE
+  EWreq = FALSE
+-> State: 9.2 <-
+  EW = TRUE
+-> State: 9.3 <-
+  EW = FALSE
+  NSlite = yellow
+  EWreq = TRUE
+-> State: 9.4 <-
+  NSlite = red
+  EWlite = green
+  EWreq = FALSE
+-- specification AG (NS = TRUE -> AG NSlite != green)  is false
+-- as demonstrated by the following execution sequence
+Trace Description: CTL Counterexample 
+Trace Type: Counterexample 
+-> State: 10.1 <-
+  NS = FALSE
+  EW = FALSE
+  NSlite = green
+  EWlite = red
+  NSreq = FALSE
+  EWreq = FALSE
+-> State: 10.2 <-
+  NS = TRUE
+-- specification AG (EW = TRUE -> AG EWlite != green)  is false
+-- as demonstrated by the following execution sequence
+Trace Description: CTL Counterexample 
+Trace Type: Counterexample 
+-> State: 11.1 <-
+  NS = FALSE
+  EW = FALSE
+  NSlite = green
+  EWlite = red
+  NSreq = FALSE
+  EWreq = FALSE
+-> State: 11.2 <-
+  EW = TRUE
+-> State: 11.3 <-
+  EW = FALSE
+  NSlite = yellow
+  EWreq = TRUE
+-> State: 11.4 <-
+  NSlite = red
+  EWlite = green
+  EWreq = FALSE
