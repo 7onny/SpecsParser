@@ -5,6 +5,7 @@
 #include<sstream>
 #include<fstream>
 #include<cstdlib>
+
 using namespace std;
 
 #define STATES 6
@@ -56,4 +57,3 @@ string getLight(int lite);
 int getLight(string lite);
 bool getReq(string req);
 int findState(state target, state **s);
-void parseTrace(string trace, state **s, char *outfile);

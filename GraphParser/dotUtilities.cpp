@@ -1,6 +1,5 @@
 #include"dotUtilities.h"
 
-
 void printHeader(string title,string filename){
 	ofstream out(filename, ios::trunc);
 	out<<"digraph {\nsubgraph cluster_0 {\n";
@@ -31,7 +30,7 @@ void wrapUp(string filename){
 
 int parseSpecs(state **s, vector<transition*> *t, string infile){
 	ifstream in(infile);
-	char fileline[200];
+	char fileline[400];
 	int k=0;
 	string casename;
 
@@ -52,7 +51,7 @@ int parseSpecs(state **s, vector<transition*> *t, string infile){
 			printFml(s,t,filename);
 			bool building_trace=true;
 			string trace="";
-			while(building_trace && in.getline(fileline, 255)){	
+			while(building_trace && in.getline(fileline, 400)){	
 				//Build trace from spec file
 				aux=string(fileline);
 				trace.append(aux+"\n");
@@ -74,8 +73,11 @@ int parseSpecs(state **s, vector<transition*> *t, string infile){
 void createScript(int diagrams, string filename){
 	ofstream out(filename, ios::trunc);
 	out<<"Set objShell = CreateObject(\"Wscript.Shell\")"<<endl;
-	out<<"objShell.CurrentDirectory = \"C:\\Users\\Jonny\\Projects\\GraphParser\\GraphParser\""<<endl;
+	out<<"objShell.CurrentDirectory = \"C:\\Users\\Jonny\\Projects\\GraphParser\\GraphParser\\wd\""<<endl;
 	out<<"objShell.run \"cmd /K";
+	out<<" dot -Tbmp diagram.dot > diagram.bmp";
+	if(diagrams>0)
+		out<<" &";
 	for(int i=0; i<diagrams; ++i){
 		out<<" dot -Tbmp CEdiagram"<<i+1<<".dot > CEdiagram"<<i+1<<".bmp";
 		if((i+1)<diagrams)

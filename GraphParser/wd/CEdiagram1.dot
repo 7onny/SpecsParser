@@ -1,0 +1,13 @@
+digraph {
+subgraph cluster_0 {
+label="AG NSlite = EWlite  is false";
+
+0 -> 1[label="EW"];
+1 -> 2[label="/NS"];
+1 -> 3[label="NS"];
+2 -> 4[label="NS"];
+3 -> 4[label=""];
+4 -> 5[label="EW"];
+4 -> 0[label="/EW"];
+5 -> 1[label=""];
+}}

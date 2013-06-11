@@ -1,5 +1,6 @@
 #include"graph.h"
 #include"dotUtilities.h"
+#include"coverage.h"
 
 #define OUT "diagram.dot"
 #define SCRIPT "script.vbs"

@@ -62,11 +62,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="coverage.cpp" />
     <ClCompile Include="dotUtilities.cpp" />
     <ClCompile Include="graph.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="coverage.h" />
     <ClInclude Include="dotUtilities.h" />
     <ClInclude Include="graph.h" />
   </ItemGroup>

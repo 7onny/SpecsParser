@@ -1,5 +1,6 @@
 #pragma once
 #include"graph.h"
+#include"coverage.h"
 
 void printHeader(string title,string filename);
 void printFml(state **s, vector<transition*> *t,string filename);

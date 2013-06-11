@@ -24,12 +24,18 @@
     <ClCompile Include="dotUtilities.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="coverage.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="graph.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="dotUtilities.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="coverage.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

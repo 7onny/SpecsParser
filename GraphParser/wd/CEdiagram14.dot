@@ -1,0 +1,23 @@
+digraph {
+subgraph cluster_0 {
+label=" G (( Y (((NSlite = green & EWlite = red) & NSreq = FALSE) & EWreq = TRUE) & ((((NSlite = yellow & EWlite = red) & NSreq = FALSE) & EWreq = TRUE) & NS = TRUE)) ->  X (((NSlite != red | EWlite != green) | NSreq != TRUE) | EWreq != FALSE))  is false";
+
+0 -> 1[label="EW"];
+1 -> 2[label="/NS"];
+1 -> 3[label="NS"];
+2 -> 4[label="NS"];
+3 -> 4[label=""];
+4 -> 5[label="EW"];
+4 -> 0[label="/EW"];
+5 -> 1[label=""];
+0 -> 1[label="",color=blue,penwidth=3.0];
+1 -> 2[label="",color=blue,penwidth=3.0];
+2 -> 4[label="",color=blue,penwidth=3.0];
+4 -> 5[label="",color=blue,penwidth=3.0];
+5 -> 1[label="",color=blue,penwidth=3.0];
+1 -> 3[label="",color=blue,penwidth=3.0];
+3 -> 4[label="",color=blue,penwidth=3.0];
+4 -> 0[label="",color=blue,penwidth=3.0];
+0 -> 1[label="",color=blue,penwidth=3.0];
+1 -> 3[label="",color=blue,penwidth=3.0];
+}}
