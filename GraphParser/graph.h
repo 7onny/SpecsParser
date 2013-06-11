@@ -1,4 +1,6 @@
-#pragma once
+#ifndef GRAPH_H
+#define GRAPH_H
+
 #include<string>
 #include<vector>
 #include<iostream>
@@ -45,7 +47,7 @@ public:
 	state* getR();
 	string getLabel();
 	transition& setLabel(string label);
-	void transition::insertTransition(ofstream *out);
+	ofstream& operator<<(ofstream &out);
 };
 
 //Utilities
@@ -57,3 +59,5 @@ string getLight(int lite);
 int getLight(string lite);
 bool getReq(string req);
 int findState(state target, state **s);
+
+#endif

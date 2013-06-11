@@ -9,16 +9,18 @@ int main(){
 	cout<<"Allocating memory"<<endl;
 	state** s = setUpStates();
 	vector<transition*> t;
+	vector<testCase*> testSet;
+
 	setUpTransitions(&t,s);
 	printHeader("Traffic Lights FSM",OUT);
 	printFml(s,&t,OUT);
 	wrapUp(OUT);
 
-	int diagrams=parseSpecs(s,&t,"specs");
+	int diagrams=parseSpecs(s,&t,"specs",&testSet);
 	createScript(diagrams, string(SCRIPT));
 
 	cout<<"Freeing memory"<<endl;
 	dropStates(s);
-	//system("pause");
+	system("pause");
 	return 0;
 }

@@ -1,9 +1,15 @@
-#pragma once
+#ifndef DOT_H
+#define DOT_H
 #include"graph.h"
-#include"coverage.h"
+class testCase;
 
 void printHeader(string title,string filename);
+void printHeader(string title, ofstream &out);
 void printFml(state **s, vector<transition*> *t,string filename);
+void printFml(state **s, vector<transition*> *t, ofstream& out);
 void wrapUp(string filename);
-int parseSpecs(state **s, vector<transition*> *t, string infile);
+void wrapUp(ofstream &out);
+int parseSpecs(state **s, vector<transition*> *t, string infile, vector<testCase*> *testSet);
 void createScript(int diagrams, string filename);
+
+#endif

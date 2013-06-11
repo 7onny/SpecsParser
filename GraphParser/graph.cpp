@@ -72,11 +72,8 @@ transition& transition::setLabel(string label){
 	Label=label;
 	return *this;
 }
-void transition::insertTransition(ofstream *out){
+ofstream& transition::operator<<(ofstream &out){
 	string line;
-	//line.append(p->getTag());
-	//line.append(" -> ");
-	//line.append(r->getTag());
 	line.append(p->getIndex());
 	line.append(" -> ");
 	line.append(r->getIndex());
@@ -88,7 +85,8 @@ void transition::insertTransition(ofstream *out){
 		line.append(options);
 	}
 	line.append("];");
-	(*out)<<line<<endl;
+	out<<line<<endl;
+	return out;
 }
 
 //Utilities

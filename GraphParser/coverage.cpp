@@ -1,5 +1,7 @@
 #include"coverage.h"
 
+#include"dotUtilities.h"
+
 testCase::testCase(int id, string name, string filename): id(id), name(name), filename(filename){}
 
 int testCase::getId(){
@@ -17,6 +19,7 @@ string testCase::getFilename(){
 
 testCase& testCase::setFilename(string name){
 	this->filename=filename;
+	return *this;
 }
 
 string testCase::getName(){
@@ -36,9 +39,18 @@ void testCase::addTransition(transition *tr){
 	t.push_back(tr);
 }
 
+void testCase::printTestCase(state **s, vector<transition*> *t){
+	ofstream out(this->filename, ios::trunc);
+	printHeader(this->name,out);
+	printFml(s,t,out);
+	vector<transition*>::iterator it;
+	for(it=(this->t).begin(); it!=(this->t).end(); it++)
+		(*it)->operator<<(out);
+	wrapUp(out);
+}
 
 
-void parseTrace(string trace, state **s, char *outfile){
+void parseTrace(string trace, state **s, char *outfile, testCase *tc){
 	ofstream out(outfile,ios::app);
 	istringstream iss(trace);
 	int a=-1, b=-1, nslite=-1, ewlite=-1;
@@ -89,8 +101,9 @@ void parseTrace(string trace, state **s, char *outfile){
 			else {b=index;}
 		}
 		if(a>-1 && b>-1){
-			transition t(s[a], s[b], "", "color=blue,penwidth=3.0");
-			t.insertTransition(&out);
+			transition *tr=new transition(s[a], s[b], "", "color=blue,penwidth=3.0");
+			//t.printTransition(&out);
+			tc->addTransition(tr);
 			a=b;
 			b=-1;
 		}

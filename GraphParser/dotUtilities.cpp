@@ -1,7 +1,14 @@
 #include"dotUtilities.h"
+#include"coverage.h"
 
 void printHeader(string title,string filename){
 	ofstream out(filename, ios::trunc);
+	out<<"digraph {\nsubgraph cluster_0 {\n";
+	out<<"label=\"";
+	out<<title<<"\";\n"<<endl;
+}
+
+void printHeader(string title, ofstream &out){
 	out<<"digraph {\nsubgraph cluster_0 {\n";
 	out<<"label=\"";
 	out<<title<<"\";\n"<<endl;
@@ -11,15 +18,14 @@ void printFml(state **s, vector<transition*> *t,string filename){
 	ofstream out(filename, ios::app);
 	vector<transition*>::iterator it;
 	for(it=(*t).begin();it!=(*t).end();it++){
-		(*it)->insertTransition(&out);
-		/*string line;
-		line.append((*it)->getP()->getTag());
-		line.append(" -> ");
-		line.append((*it)->getR()->getTag());
-		line.append("[label=\"");
-		line.append((*it)->getLabel());
-		line.append("\"];");
-		out<<line<<endl;*/
+		(*it)->operator<<(out);
+	}
+}
+
+void printFml(state **s, vector<transition*> *t, ofstream& out){
+	vector<transition*>::iterator it;
+	for(it=(*t).begin();it!=(*t).end();it++){
+		(*it)->operator<<(out);
 	}
 }
 
@@ -28,9 +34,18 @@ void wrapUp(string filename){
 	out<<"}}"<<endl;
 }
 
-int parseSpecs(state **s, vector<transition*> *t, string infile){
+void wrapUp(ofstream &out){
+	out<<"}}"<<endl;
+}
+
+int parseSpecs(state **s, vector<transition*> *t, string infile, vector<testCase*> *testSet){
+	/*	s - states in model
+		t - transitions in model
+		infile - specs filename
+		testSet - set of test cases from specs file
+	*/
 	ifstream in(infile);
-	char fileline[400];
+	char fileline[800];
 	int k=0;
 	string casename;
 
@@ -47,11 +62,15 @@ int parseSpecs(state **s, vector<transition*> *t, string infile){
 			char fname[20];
 			sprintf(fname,"CEdiagram%d.dot", k);
 			string filename(fname);
-			printHeader(casename,filename);
-			printFml(s,t,filename);
+
+			testCase *tc=new testCase(k,casename,filename);
+			//printHeader(casename,filename);
+			//printFml(s,t,filename);
+
 			bool building_trace=true;
 			string trace="";
-			while(building_trace && in.getline(fileline, 400)){	
+
+			while(building_trace && in.getline(fileline, 800)){	
 				//Build trace from spec file
 				aux=string(fileline);
 				trace.append(aux+"\n");
@@ -63,8 +82,10 @@ int parseSpecs(state **s, vector<transition*> *t, string infile){
 				}
 			}
 			
-			parseTrace(trace,s,fname);
-			wrapUp(filename);
+			parseTrace(trace,s,fname, tc);
+			testSet->push_back(tc);
+			tc->printTestCase(s,t);
+			//wrapUp(filename);
 		}
 	}
 	return k;
