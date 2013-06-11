@@ -1,6 +1,40 @@
 #include"coverage.h"
 
+testCase::testCase(int id, string name, string filename): id(id), name(name), filename(filename){}
 
+int testCase::getId(){
+	return id;
+}
+
+testCase& testCase::setId(int id){
+	this->id=id;
+	return *this;
+}
+
+string testCase::getFilename(){
+	return filename;
+}
+
+testCase& testCase::setFilename(string name){
+	this->filename=filename;
+}
+
+string testCase::getName(){
+	return name;
+}
+
+testCase& testCase::setName(string name){
+	this->name=name;
+	return *this;
+}
+
+int testCase::getSize(){
+	return t.size();
+}
+
+void testCase::addTransition(transition *tr){
+	t.push_back(tr);
+}
 
 
 
