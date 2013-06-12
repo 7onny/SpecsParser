@@ -18,14 +18,14 @@ void printFml(state **s, vector<transition*> *t,string filename){
 	ofstream out(filename, ios::app);
 	vector<transition*>::iterator it;
 	for(it=(*t).begin();it!=(*t).end();it++){
-		(*it)->operator<<(out);
+		out<<(**it);
 	}
 }
 
 void printFml(state **s, vector<transition*> *t, ofstream& out){
 	vector<transition*>::iterator it;
 	for(it=(*t).begin();it!=(*t).end();it++){
-		(*it)->operator<<(out);
+		out<<(**it);
 	}
 }
 
@@ -38,7 +38,7 @@ void wrapUp(ofstream &out){
 	out<<"}}"<<endl;
 }
 
-int parseSpecs(state **s, vector<transition*> *t, string infile, vector<testCase*> *testSet){
+int parseSpecs(state **s, vector<transition*> *t, string infile, testSet *ts){
 	/*	s - states in model
 		t - transitions in model
 		infile - specs filename
@@ -83,7 +83,7 @@ int parseSpecs(state **s, vector<transition*> *t, string infile, vector<testCase
 			}
 			
 			parseTrace(trace,s,fname, tc);
-			testSet->push_back(tc);
+			ts->addTestCase(tc);
 			tc->printTestCase(s,t);
 			//wrapUp(filename);
 		}

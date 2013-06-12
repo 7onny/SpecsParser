@@ -18,6 +18,17 @@ public:
 	int getSize();
 	void addTransition(transition *tr);
 	void printTestCase(state **s, vector<transition*> *t);
+	bool searchTransition(transition *target);
+	float checkTransitionCoverage(vector<transition*> *mt);
+};
+
+class testSet{
+	vector<testCase*> ts;
+public:
+	testSet();
+	int getSize();
+	void addTestCase(testCase *tc);
+	float checkTransitionCoverage(vector<transition*> *mt);
 };
 
 void parseTrace(string trace, state **s, char *outfile, testCase *tc);

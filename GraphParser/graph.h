@@ -10,7 +10,9 @@
 
 using namespace std;
 
+//Total States and transitions in model
 #define STATES 6
+#define TRANSITIONS 8
 
 enum {green, yellow , red};
 
@@ -47,7 +49,8 @@ public:
 	state* getR();
 	string getLabel();
 	transition& setLabel(string label);
-	ofstream& operator<<(ofstream &out);
+	bool operator==(transition *t);
+	friend ofstream& operator<<(ofstream &out, transition& t);
 };
 
 //Utilities
@@ -58,6 +61,6 @@ void dropTransitions(vector<transition> t);
 string getLight(int lite);
 int getLight(string lite);
 bool getReq(string req);
-int findState(state target, state **s);
+int findState(state *target, state **s);
 
 #endif

@@ -45,11 +45,73 @@ void testCase::printTestCase(state **s, vector<transition*> *t){
 	printFml(s,t,out);
 	vector<transition*>::iterator it;
 	for(it=(this->t).begin(); it!=(this->t).end(); it++)
-		(*it)->operator<<(out);
+		out<<(**it);
 	wrapUp(out);
 }
 
+bool testCase::searchTransition(transition *target){
+	for(vector<transition*>::iterator it=t.begin(); it!=t.end(); it++)
+		if((**it)==target)
+			return true;
+	return false;
+}
 
+float testCase::checkTransitionCoverage(vector<transition*> *mt){
+	float coverage;
+	bool covered[TRANSITIONS];
+	for(int i=0; i<TRANSITIONS; ++i) covered[i]=false;
+
+	vector<transition*>::iterator i;
+	vector<transition*>::iterator j;
+	int index;
+	for(i=mt->begin(), index=0; i!=mt->end(); i++, index++)
+		for(j=t.begin(); j!=t.end(); j++)
+			if((**i)==(*j)){
+				covered[index]=true;
+			}	
+	int count=0;
+	for(int i=0; i<TRANSITIONS; ++i)
+		if(covered[i])
+			count++;
+	coverage=(float)count/TRANSITIONS;
+	return coverage;
+}
+
+
+testSet::testSet(){}
+
+int testSet::getSize(){
+	return ts.size();
+}
+
+void testSet::addTestCase(testCase *tc){
+	ts.push_back(tc);
+}
+
+float testSet::checkTransitionCoverage(vector<transition*> *mt){
+	float coverage;
+	bool covered[TRANSITIONS];
+	for(int i=0; i<TRANSITIONS; ++i) covered[i]=false;
+
+	vector<transition*>::iterator i;
+	vector<testCase*>::iterator j;
+	int index;
+	for(i=mt->begin(),index=0; i!=mt->end(); i++,index++)
+		for(j=ts.begin(); j!=ts.end(),!covered[index]; j++)
+			if((*j)->searchTransition(*i))
+				covered[index]=true;
+
+	int count=0;
+	for(int i=0; i<TRANSITIONS; ++i)
+		if(covered[i])
+			count++;
+	coverage=(float)count/TRANSITIONS;
+	
+	return coverage;
+}
+
+
+//-------------------------------------------------------------------------
 void parseTrace(string trace, state **s, char *outfile, testCase *tc){
 	ofstream out(outfile,ios::app);
 	istringstream iss(trace);
@@ -94,7 +156,7 @@ void parseTrace(string trace, state **s, char *outfile, testCase *tc){
 
 		if(newstate){
 			state p("0", nslite, ewlite, nsreq, ewreq);
-			int index=findState(p,s);
+			int index=findState(&p,s);
 			newstate=false;
 			change=false;
 			if(a==-1){a=index;}

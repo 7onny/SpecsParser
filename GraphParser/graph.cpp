@@ -72,17 +72,22 @@ transition& transition::setLabel(string label){
 	Label=label;
 	return *this;
 }
-ofstream& transition::operator<<(ofstream &out){
+bool transition::operator==(transition *t){
+	if(!((this->getP())==(t->getP()))) return false;
+	if(!((this->getR())==(t->getR()))) return false;
+	return true;
+}
+ofstream& operator<<(ofstream &out, transition& t){
 	string line;
-	line.append(p->getIndex());
+	line.append(t.p->getIndex());
 	line.append(" -> ");
-	line.append(r->getIndex());
+	line.append(t.r->getIndex());
 	line.append("[label=\"");
-	line.append(Label);
+	line.append(t.Label);
 	line.append("\"");
-	if(options.compare("")!=0){
+	if(t.options.compare("")!=0){
 		line.append(",");
-		line.append(options);
+		line.append(t.options);
 	}
 	line.append("];");
 	out<<line<<endl;
@@ -166,9 +171,9 @@ bool getReq(string req){
 		return false;
 }
 
-int findState(state target, state **s){
+int findState(state *target, state **s){
 	for(int i=0; i<STATES; ++i)
-		if(target==s[i]){
+		if(*target==s[i]){
 			return i;
 		}
 	return -1;
