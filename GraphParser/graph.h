@@ -7,6 +7,7 @@
 #include<sstream>
 #include<fstream>
 #include<cstdlib>
+#include<algorithm>
 
 using namespace std;
 

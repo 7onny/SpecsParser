@@ -21,12 +21,14 @@ int main(){
 
 	vector<transitionPair*> *tp=getTPairs(s,&t);
 
+	testSet *prioSet=ts.priorityCull(tp);
+
 	//tests-------------
-	transitionPair *test=new transitionPair(s[1],&transition(s[0],s[1],"",""),&transition(s[1],s[2],"",""));
-	cout<<"\n----\n"<<ts.ts[2]->searchTPair(test)<<"\n----\n\n";
-	cout<<"\n----TC_TPcoverage\n"<<ts.ts[2]->computeTPairCoverage(tp)<<"\n----\n\n";
-	cout<<"\n----TS_Tcoverage\n"<<ts.computeTransitionCoverage(&t)<<"\n----\n\n";
-	cout<<"\n----TS_TPcoverage\n"<<ts.computeTPairCoverage(tp)<<"\n----\n\n";
+	//transitionPair *test=new transitionPair(s[1],&transition(s[0],s[1],"",""),&transition(s[1],s[2],"",""));
+	//cout<<"\n----\n"<<ts.ts[2]->searchTPair(test)<<"\n----\n\n";
+	//cout<<"\n----TC_TPcoverage\n"<<ts.ts[2]->computeTPairCoverage(tp)<<"\n----\n\n";
+	//cout<<"\n----TS_Tcoverage\n"<<ts.computeTransitionCoverage(&t)<<"\n----\n\n";
+	//cout<<"\n----TS_TPcoverage\n"<<ts.computeTPairCoverage(tp)<<"\n----\n\n";
 	//------------------
 
 	cout<<"Freeing memory"<<endl;

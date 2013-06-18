@@ -4,28 +4,28 @@
 
 //TESTCASE
 testCase::testCase(int id, string name, string filename): id(id), name(name), filename(filename){}
-int testCase::getId(){
+int testCase::getId() const{
 	return id;
 }
 testCase& testCase::setId(int id){
 	this->id=id;
 	return *this;
 }
-string testCase::getFilename(){
+string testCase::getFilename() const{
 	return filename;
 }
 testCase& testCase::setFilename(string name){
 	this->filename=filename;
 	return *this;
 }
-string testCase::getName(){
+string testCase::getName() const{
 	return name;
 }
 testCase& testCase::setName(string name){
 	this->name=name;
 	return *this;
 }
-int testCase::getSize(){
+int testCase::getSize() const{
 	return t.size();
 }
 void testCase::addTransition(transition *tr){
@@ -102,7 +102,7 @@ float testCase::computeTPairCoverage(vector<transitionPair*> *tp){
 
 //TESTSET
 testSet::testSet(){}
-int testSet::getSize(){
+int testSet::getSize() const{
 	return ts.size();
 }
 void testSet::addTestCase(testCase *tc){
@@ -146,9 +146,11 @@ float testSet::computeTPairCoverage(vector<transitionPair*> *tp){
 	vector<transitionPair*>::iterator i;
 	vector<testCase*>::iterator j;
 	for(i=tp->begin(); i!=tp->end(); i++,index++){
-		for(j=ts.begin(); j!=ts.end(), !covered[index]; j++){
-			if((*j)->searchTPair(*i))
-				covered[index]=true;
+		if(!covered[index]){
+			for(j=ts.begin(); j!=ts.end(); j++){
+				if((*j)->searchTPair(*i))
+					covered[index]=true;
+			}
 		}
 	}
 
@@ -157,35 +159,85 @@ float testSet::computeTPairCoverage(vector<transitionPair*> *tp){
 		if(covered[i])
 			count++;
 	coverage=(float)count/n;
-
+	delete [] covered;
 	return coverage;
 }
+void testSet::prioritize(vector<transitionPair*> *tp, testSet *result) const{
+	//Reorders the testSet by TPCoverage
+	comparisonOperator *comp=new comparisonOperator(tp);
 
+	sort(result->ts.begin(),result->ts.end(),(*comp));
+
+	//if(VB){
+	//	for(vector<testCase*>::iterator it=result->ts.begin(); it!=result->ts.end(); ++it)
+	//		cout<<(*it)->computeTPairCoverage(tp)<<endl;
+	//	cout<<"----------------------\n";
+	//}
+}
+testSet* testSet::priorityCull(vector<transitionPair*> *tp) const{
+	testSet *result=new testSet(*this);
+	prioritize(tp,result);
+
+	float coverage=result->computeTPairCoverage(tp);	
+	bool cull=true;
+	if(coverage<1.0) cull=false;
+
+	while(cull && !(result->ts.empty())){
+		testCase *tc=result->ts.back();
+		result->ts.pop_back();
+		coverage=result->computeTPairCoverage(tp);
+		if(coverage<1.0){	//Maintain 100% coverage
+			cull=false;
+			result->ts.push_back(tc);
+		}
+	}
+
+	if(VB){
+		for(vector<testCase*>::iterator it=result->ts.begin(); it!=result->ts.end(); ++it)
+			cout<<(*it)->computeTPairCoverage(tp)<<endl;
+		cout<<"----------------------\n";
+	}
+
+	return result;
+}
 
 
 //TRANSITION-PAIR
 transitionPair::transitionPair(state *s, transition *a, transition *b): s(s), a(a), b(b) {}
-state* transitionPair::getState(){
+state* transitionPair::getState() const{
 	return s;
 }
 transitionPair& transitionPair::setState(state *s){
 	this->s=s;
 	return (*this);
 }
-transition* transitionPair::getA(){
+transition* transitionPair::getA() const{
 	return a;
 }
 transitionPair& transitionPair::setA(transition *a){
 	this->a=a;
 	return (*this);
 }
-transition* transitionPair::getB(){
+transition* transitionPair::getB() const{
 	return b;
 }
 transitionPair& transitionPair::setB(transition *b){
 	this->b=b;
 	return (*this);
 }
+
+
+//ComparisonOperator
+comparisonOperator::comparisonOperator(const vector<transitionPair*> *tp){ 
+	this->tp=(vector<transitionPair*>*)tp; 
+}
+bool comparisonOperator::operator()(testCase *a, testCase *b) const{
+	float ta=a->computeTPairCoverage(tp);
+	float tb=b->computeTPairCoverage(tp);
+	return ta>tb;
+}
+
+
 
 //-------------------------------------------------------------------------
 void parseTrace(string trace, state **s, char *outfile, testCase *tc){
@@ -273,3 +325,4 @@ vector<transitionPair*>* getTPairs(state **s, vector<transition*> *mt){
 	}
 	return tpairs;
 }
+
