@@ -9,7 +9,7 @@ int main(){
 	cout<<"Allocating memory"<<endl;
 	state** s = setUpStates();
 	vector<transition*> t;
-	testSet ts;
+	testSet ts, *prioSet=0, *extendSet=0;
 
 	setUpTransitions(&t,s);
 	printHeader("Traffic Lights FSM",OUT);
@@ -18,21 +18,53 @@ int main(){
 
 	int diagrams=parseSpecs(s,&t,"specs",&ts);
 	createScript(diagrams, string(SCRIPT));
-
 	vector<transitionPair*> *tp=getTPairs(s,&t);
 
-	testSet *prioSet=ts.priorityCull(tp);
+	cout<<"Test cases parsed.\nSelect operation to perform:\n";
+	cout<<"\t1 - Generate diagrams for the original test set\n";
+	cout<<"\t2 - Generate diagrams for the minimized test set using Priority Cull\n";
+	cout<<"\t3 - Generate diagrams for the minimized test set using Subgraph Cull\n";
+	cout<<"\t0 - Exit application\n";
+	cout<<"---------------------------------------------\n";
 
-	//tests-------------
-	//transitionPair *test=new transitionPair(s[1],&transition(s[0],s[1],"",""),&transition(s[1],s[2],"",""));
-	//cout<<"\n----\n"<<ts.ts[2]->searchTPair(test)<<"\n----\n\n";
-	//cout<<"\n----TC_TPcoverage\n"<<ts.ts[2]->computeTPairCoverage(tp)<<"\n----\n\n";
-	//cout<<"\n----TS_Tcoverage\n"<<ts.computeTransitionCoverage(&t)<<"\n----\n\n";
-	//cout<<"\n----TS_TPcoverage\n"<<ts.computeTPairCoverage(tp)<<"\n----\n\n";
-	//------------------
+	int option=0;
+	cin>>option;
+	float tpc=0;
+	switch(option){
+	case 1:
+		ts.printTestCase(s,&t);
+		cout<<"Test set size: "<<ts.getSize()<<endl;
+		tpc=ts.computeTPairCoverage(tp);
+		cout<<"Transition-Pair Coverage: "<<tpc*100<<"%"<<endl;
+		break;
+	case 2:
+		prioSet=ts.priorityCull(tp);
+		prioSet->printTestCase(s,&t);
+		cout<<"Original Test set size: "<<ts.getSize()<<endl;
+		cout<<"Final Test set size: "<<prioSet->getSize()<<endl;
+		tpc=prioSet->computeTPairCoverage(tp);
+		cout<<"Transition-Pair Coverage: "<<tpc*100<<"%"<<endl;
+		break;
+	case 3:
+		extendSet=ts.subgraphCull(tp);
+		extendSet->printTestCase(s,&t);
+		cout<<"Original Test set size: "<<ts.getSize()<<endl;
+		cout<<"Final Test set size: "<<extendSet->getSize()<<endl;
+		tpc=extendSet->computeTPairCoverage(tp);
+		cout<<"Transition-Pair Coverage: "<<tpc*100<<"%"<<endl;
+		break;
+	default:
+		break;
+	}
 
-	cout<<"Freeing memory"<<endl;
+	cout<<"---------------------------------------------\nJob Done.\n";
+	cout<<"Freeing memory.."<<endl;
+	tp->clear();
+	if(prioSet) delete prioSet;
+	if(extendSet) delete extendSet;
 	dropStates(s);
+
+	cout<<"Exiting application.\n";
 	system("pause");
 	return 0;
 }

@@ -110,7 +110,6 @@ void dropStates(state **s){
 	for(int i=0; i<STATES; ++i)
 		delete s[i];
 	delete [] s;
-	cout<<"States dropped"<<endl;
 }
 
 void setUpTransitions(vector<transition*> *trans, state **s){

@@ -2,7 +2,7 @@
 #define COVERAGE_H
 #include"graph.h"
 
-#define VB 1
+#define VB 0
 
 class transitionPair;
 
@@ -26,6 +26,8 @@ public:
 	float computeTransitionCoverage(vector<transition*> *mt);
 	bool searchTPair(transitionPair *target);
 	float computeTPairCoverage(vector<transitionPair*> *tp);
+	bool contains(testCase *contained);
+	bool operator<(testCase *contained);	// a < b -> a contains b
 };
 
 class testSet{
@@ -37,8 +39,10 @@ public:
 	float computeTransitionCoverage(vector<transition*> *mt);
 	bool searchTPair(transitionPair *target);
 	float computeTPairCoverage(vector<transitionPair*> *tp);
-	void prioritize(vector<transitionPair*> *tp, testSet *result) const;
-	testSet* priorityCull(vector<transitionPair*> *tp) const;
+	testSet& prioritize(vector<transitionPair*> *tp);
+	testSet* priorityCull(vector<transitionPair*> *tp);
+	testSet* subgraphCull(vector<transitionPair*> *tp);
+	void printTestCase(state **s, vector<transition*> *t);
 };
 
 class transitionPair{

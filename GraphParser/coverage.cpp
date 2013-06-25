@@ -97,7 +97,31 @@ float testCase::computeTPairCoverage(vector<transitionPair*> *tp){
 	delete [] covered;
 	return coverage;
 }
+bool testCase::contains(testCase *contained){
+	//Checks whether or not testCase "contained" is included in (*this)
+	if(contained->t.empty()) return false;
+	if(t.size()>contained->t.size()) return false;
+	if(id==contained->id) return false;
 
+	bool start_found=false;
+	vector<transition*>::iterator i, j;
+	j=contained->t.begin();
+	for(i=t.begin(); i!=t.end(), j!=contained->t.end(); ++i){
+		if(start_found && !((**i)==(*j))){	//Sequence broken
+			return false;
+		}
+		if(!start_found && (**i)==(*j)){	//Root found
+			start_found=true;
+		}
+		//Any other case: Looking for root or next node in sequence
+		++j;
+	}
+	//Sequence was found in *this and not broken
+	return true;
+}
+bool testCase::operator<(testCase *contained){
+	return this->contains(contained);
+}
 
 
 //TESTSET
@@ -162,32 +186,27 @@ float testSet::computeTPairCoverage(vector<transitionPair*> *tp){
 	delete [] covered;
 	return coverage;
 }
-void testSet::prioritize(vector<transitionPair*> *tp, testSet *result) const{
+testSet& testSet::prioritize(vector<transitionPair*> *tp) {
 	//Reorders the testSet by TPCoverage
 	comparisonOperator *comp=new comparisonOperator(tp);
 
-	sort(result->ts.begin(),result->ts.end(),(*comp));
-
-	//if(VB){
-	//	for(vector<testCase*>::iterator it=result->ts.begin(); it!=result->ts.end(); ++it)
-	//		cout<<(*it)->computeTPairCoverage(tp)<<endl;
-	//	cout<<"----------------------\n";
-	//}
+	sort(ts.begin(),ts.end(),(*comp));
+	return (*this);
 }
-testSet* testSet::priorityCull(vector<transitionPair*> *tp) const{
+testSet* testSet::priorityCull(vector<transitionPair*> *tp){
 	testSet *result=new testSet(*this);
-	prioritize(tp,result);
+	result->prioritize(tp);
 
 	float coverage=result->computeTPairCoverage(tp);	
-	bool cull=true;
-	if(coverage<1.0) cull=false;
+	bool repeat=true;
+	if(coverage<1.0) repeat=false;
 
-	while(cull && !(result->ts.empty())){
+	while(repeat && !(result->ts.empty())){
 		testCase *tc=result->ts.back();
 		result->ts.pop_back();
 		coverage=result->computeTPairCoverage(tp);
 		if(coverage<1.0){	//Maintain 100% coverage
-			cull=false;
+			repeat=false;
 			result->ts.push_back(tc);
 		}
 	}
@@ -200,6 +219,49 @@ testSet* testSet::priorityCull(vector<transitionPair*> *tp) const{
 
 	return result;
 }
+testSet* testSet::subgraphCull(vector<transitionPair*> *tp){
+	this->prioritize(tp);	//ordering saves us a lot of useless comparisons
+	testSet *result=new testSet();
+
+	int const size=ts.size();
+	float coverage=computeTPairCoverage(tp);	
+	bool repeat=true;
+	if(coverage<1.0) repeat=false;
+	bool *cull=new bool[size];
+	for(int i=0; i<size; ++i) cull[i]=false;
+
+	vector<testCase*>::iterator it;
+	int n=size;
+	while(n>0){
+		n--;
+		if((ts[n])->getSize()==0){		//Test cases with no transitions are subgraphs
+			cull[n]=true;
+		}
+		for(it=ts.begin(); !cull[n] && it!=ts.end(); ++it){		//Look for extended Test cases
+			if(((*it)->getSize()>=ts[n]->getSize()) && (*it)->contains(ts[n])){ 
+					cull[n]=true; 
+			}
+		}
+		bool watch=cull[n];
+		int dummy=1+1;
+	}
+	
+	for(int i=0; i<size; ++i){
+		if(!cull[i]){
+			result->addTestCase(ts[i]);
+		}
+	}
+
+	delete [] cull;
+
+	return result;
+}
+void testSet::printTestCase(state **s, vector<transition*> *t){
+	vector<testCase*>::iterator it;
+	for(it=ts.begin(); it!=ts.end(); ++it)
+		(*it)->printTestCase(s,t);
+}
+
 
 
 //TRANSITION-PAIR

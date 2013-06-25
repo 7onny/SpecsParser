@@ -58,14 +58,12 @@ int parseSpecs(state **s, vector<transition*> *t, string infile, testSet *ts){
 		}
 		else if(line.compare("Trace Type: Counterexample ")==0){
 			k++;
-			cout<<"Test case "<<k<<": "<<casename<<endl;
+			//cout<<"Test case "<<k<<": "<<casename<<endl;
 			char fname[20];
 			sprintf(fname,"CEdiagram%d.dot", k);
 			string filename(fname);
 
 			testCase *tc=new testCase(k,casename,filename);
-			//printHeader(casename,filename);
-			//printFml(s,t,filename);
 
 			bool building_trace=true;
 			string trace="";
@@ -84,8 +82,6 @@ int parseSpecs(state **s, vector<transition*> *t, string infile, testSet *ts){
 			
 			parseTrace(trace,s,fname, tc);
 			ts->addTestCase(tc);
-			tc->printTestCase(s,t);
-			//wrapUp(filename);
 		}
 	}
 	return k;
