@@ -11,7 +11,9 @@ void printFml(state **s, vector<transition*> *t,string filename);
 void printFml(state **s, vector<transition*> *t, ofstream& out);
 void wrapUp(string filename);
 void wrapUp(ofstream &out);
-int parseSpecs(state **s, vector<transition*> *t, string infile, testSet *ts);
-void createScript(int diagrams, string filename);
+void parseSpecs(state **s, vector<transition*> *t, string infile, testSet *ts);
+void createScript(bool *selected, int n, string filename);
+bool clearWD();
+
 
 #endif

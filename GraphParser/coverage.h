@@ -2,8 +2,6 @@
 #define COVERAGE_H
 #include"graph.h"
 
-#define VB 0
-
 class transitionPair;
 
 class testCase{
@@ -22,6 +20,7 @@ public:
 	int getSize() const;
 	void addTransition(transition *tr);
 	void printTestCase(state **s, vector<transition*> *t);
+	bool searchState(state *s);
 	bool searchTransition(transition *target);
 	float computeTransitionCoverage(vector<transition*> *mt);
 	bool searchTPair(transitionPair *target);
@@ -38,11 +37,13 @@ public:
 	void addTestCase(testCase *tc);
 	float computeTransitionCoverage(vector<transition*> *mt);
 	bool searchTPair(transitionPair *target);
+	float computeStateCoverage(state **s);
 	float computeTPairCoverage(vector<transitionPair*> *tp);
 	testSet& prioritize(vector<transitionPair*> *tp);
 	testSet* priorityCull(vector<transitionPair*> *tp);
-	testSet* subgraphCull(vector<transitionPair*> *tp);
-	void printTestCase(state **s, vector<transition*> *t);
+	testSet* subgraphCull(vector<transitionPair*> *tp, state **s);
+	void printTestSet(state **s, vector<transition*> *t);
+	bool* getSelectedCases(int n);
 };
 
 class transitionPair{
@@ -66,7 +67,7 @@ public:
 	bool operator()(testCase *a, testCase *b) const;
 };
 
-void parseTrace(string trace, state **s, char *outfile, testCase *tc);
+void parseTrace(string trace, state **s, testCase *tc);
 vector<transitionPair*>* getTPairs(state **s, vector<transition*> *mt);
 
 

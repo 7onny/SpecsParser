@@ -38,7 +38,7 @@ void wrapUp(ofstream &out){
 	out<<"}}"<<endl;
 }
 
-int parseSpecs(state **s, vector<transition*> *t, string infile, testSet *ts){
+void parseSpecs(state **s, vector<transition*> *t, string infile, testSet *ts){
 	/*	s - states in model
 		t - transitions in model
 		infile - specs filename
@@ -80,25 +80,32 @@ int parseSpecs(state **s, vector<transition*> *t, string infile, testSet *ts){
 				}
 			}
 			
-			parseTrace(trace,s,fname, tc);
+			parseTrace(trace,s, tc);
 			ts->addTestCase(tc);
 		}
 	}
-	return k;
 }
 
-void createScript(int diagrams, string filename){
+void createScript(bool *selected, int n, string filename){
 	ofstream out(filename, ios::trunc);
 	out<<"Set objShell = CreateObject(\"Wscript.Shell\")"<<endl;
 	out<<"objShell.CurrentDirectory = \"C:\\Users\\Jonny\\Projects\\GraphParser\\GraphParser\\wd\""<<endl;
-	out<<"objShell.run \"cmd /K";
-	out<<" dot -Tbmp diagram.dot > diagram.bmp";
-	if(diagrams>0)
+	//out<<"objShell.run \"cmd /K ";
+	//out<<"DEL CEdiagram*\""<<endl;
+	out<<"objShell.run \"cmd /K ";
+	out<<"dot -Tbmp diagram.dot > diagram.bmp";
+	if(n>0)
 		out<<" &";
-	for(int i=0; i<diagrams; ++i){
-		out<<" dot -Tbmp CEdiagram"<<i+1<<".dot > CEdiagram"<<i+1<<".bmp";
-		if((i+1)<diagrams)
-			out<<" &";
+	for(int i=0; i<n; ++i){
+		if(selected[i]){
+			out<<" dot -Tbmp CEdiagram"<<i+1<<".dot > CEdiagram"<<i+1<<".bmp & ";
+		}
 	}
-	out<<" & exit\"";
+	out<<"exit\"";
+}
+bool clearWD(){
+	char *cmd="DEL CEdiagram*";
+	FILE* pipe=_popen(cmd,"r");
+	if(!pipe) return false;
+	return true;
 }

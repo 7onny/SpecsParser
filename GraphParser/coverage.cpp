@@ -1,5 +1,4 @@
 #include"coverage.h"
-
 #include"dotUtilities.h"
 
 //TESTCASE
@@ -39,6 +38,16 @@ void testCase::printTestCase(state **s, vector<transition*> *t){
 	for(it=(this->t).begin(); it!=(this->t).end(); it++)
 		out<<(**it);
 	wrapUp(out);
+}
+bool testCase::searchState(state *s){
+	for(vector<transition*>::iterator it=t.begin(); it!=t.end(); it++){
+		state *a,*b;
+		a=(*it)->getP();
+		b=(*it)->getR();
+		if((*a)==s) return true;
+		if((*b)==s) return true;
+	}
+	return false;
 }
 bool testCase::searchTransition(transition *target){
 	for(vector<transition*>::iterator it=t.begin(); it!=t.end(); it++)
@@ -160,6 +169,28 @@ bool testSet::searchTPair(transitionPair *target){
 			return true;
 	return false;
 }
+float testSet::computeStateCoverage(state **s){
+	float coverage;
+	bool covered[STATES];
+	for(int i=0; i<STATES; ++i) covered[i]=false;
+
+	vector<testCase*>::iterator i;
+	vector<transition*>::iterator j;
+	
+	for(i=ts.begin();i!=ts.end();++i){
+		for(int j=0; j<STATES; ++j){
+			if(!covered[j] && (*i)->searchState(s[j]))
+				covered[j]=true;
+		}	
+	}
+	int count=0;
+	for(int i=0; i<STATES; ++i)
+		if(covered[i])
+			count++;
+	coverage=(float)count/STATES;
+	
+	return coverage;
+}
 float testSet::computeTPairCoverage(vector<transitionPair*> *tp){
 	float coverage;
 	int n=tp->size();
@@ -197,36 +228,34 @@ testSet* testSet::priorityCull(vector<transitionPair*> *tp){
 	testSet *result=new testSet(*this);
 	result->prioritize(tp);
 
-	float coverage=result->computeTPairCoverage(tp);	
+	float const initial_coverage=result->computeTPairCoverage(tp);	
+	float coverage;
 	bool repeat=true;
-	if(coverage<1.0) repeat=false;
 
 	while(repeat && !(result->ts.empty())){
 		testCase *tc=result->ts.back();
 		result->ts.pop_back();
 		coverage=result->computeTPairCoverage(tp);
-		if(coverage<1.0){	//Maintain 100% coverage
+		if(coverage<initial_coverage){	//Maintain 100% coverage
 			repeat=false;
 			result->ts.push_back(tc);
 		}
 	}
 
-	if(VB){
-		for(vector<testCase*>::iterator it=result->ts.begin(); it!=result->ts.end(); ++it)
-			cout<<(*it)->computeTPairCoverage(tp)<<endl;
-		cout<<"----------------------\n";
-	}
-
 	return result;
 }
-testSet* testSet::subgraphCull(vector<transitionPair*> *tp){
+testSet* testSet::subgraphCull(vector<transitionPair*> *tp, state **s){
 	this->prioritize(tp);	//ordering saves us a lot of useless comparisons
 	testSet *result=new testSet();
 
 	int const size=ts.size();
 	float coverage=computeTPairCoverage(tp);	
 	bool repeat=true;
-	if(coverage<1.0) repeat=false;
+	if(coverage<1.0 && (computeStateCoverage(s)<1.0)){
+		//If we don't have state coverage we can't assume that testCases with no 
+		//transitions are subgraphs trivially and must abort the operation
+		return result;
+	}
 	bool *cull=new bool[size];
 	for(int i=0; i<size; ++i) cull[i]=false;
 
@@ -242,8 +271,6 @@ testSet* testSet::subgraphCull(vector<transitionPair*> *tp){
 					cull[n]=true; 
 			}
 		}
-		bool watch=cull[n];
-		int dummy=1+1;
 	}
 	
 	for(int i=0; i<size; ++i){
@@ -256,10 +283,19 @@ testSet* testSet::subgraphCull(vector<transitionPair*> *tp){
 
 	return result;
 }
-void testSet::printTestCase(state **s, vector<transition*> *t){
+void testSet::printTestSet(state **s, vector<transition*> *t){
 	vector<testCase*>::iterator it;
 	for(it=ts.begin(); it!=ts.end(); ++it)
 		(*it)->printTestCase(s,t);
+}
+bool* testSet::getSelectedCases(int n){
+	bool *select=new bool[n];
+	for(int i=0; i<n; ++i) select[i]=false;
+	vector<testCase*>::iterator it;
+	for(it=ts.begin(); it!=ts.end(); ++it)
+		select[((*it)->getId())-1]=true;
+
+	return select;
 }
 
 
@@ -302,8 +338,7 @@ bool comparisonOperator::operator()(testCase *a, testCase *b) const{
 
 
 //-------------------------------------------------------------------------
-void parseTrace(string trace, state **s, char *outfile, testCase *tc){
-	ofstream out(outfile,ios::app);
+void parseTrace(string trace, state **s, testCase *tc){
 	istringstream iss(trace);
 	int a=-1, b=-1, nslite=-1, ewlite=-1;
 	bool change=false, newstate=false, nsreq, ewreq, end_of_trace=false;
