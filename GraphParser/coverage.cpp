@@ -1,8 +1,27 @@
 #include"coverage.h"
 #include"dotUtilities.h"
+#include<time.h>
 
 //TESTCASE
 testCase::testCase(int id, string name, string filename): id(id), name(name), filename(filename){}
+
+testCase::testCase(int id, int size, state **s){
+	this->id=id;
+	name="stressTestcase";
+	filename="";
+
+	int k=0, a=0, b=1;
+	while(k<size){
+		transition *t=new transition(s[a],s[b],"","");
+		addTransition(t);
+		k++;
+		if(a==STATES-1) a=0;
+		else a++;
+		if(b==STATES-1) b=0;
+		else b++;
+	}
+}
+
 int testCase::getId() const{
 	return id;
 }
@@ -76,12 +95,14 @@ float testCase::computeTransitionCoverage(vector<transition*> *mt){
 	return coverage;
 }
 bool testCase::searchTPair(transitionPair *target){
-	bool first_piece=false;
 	for(vector<transition*>::iterator it=t.begin(); it!=t.end(); it++){
-		if((**it)==target->getA())
-			first_piece=true;
-		if(first_piece && (**it)==target->getB())
-			return true;
+		if((**it)==target->getA()){
+			it++;
+			if(it!=t.end() && (**it)==target->getB())
+				return true;
+			else 
+				return false;
+		}
 	}
 	return false;
 }
@@ -256,8 +277,11 @@ testSet* testSet::subgraphCull(vector<transitionPair*> *tp, state **s){
 		//transitions are subgraphs trivially and must abort the operation
 		return result;
 	}
-	bool *cull=new bool[size];
-	for(int i=0; i<size; ++i) cull[i]=false;
+	bool *cull=new bool[size], *dom=new bool[size];
+	for(int i=0; i<size; ++i) {
+		cull[i]=false;
+		dom[i]=false;
+	}
 
 	vector<testCase*>::iterator it;
 	int n=size;
@@ -266,20 +290,24 @@ testSet* testSet::subgraphCull(vector<transitionPair*> *tp, state **s){
 		if((ts[n])->getSize()==0){		//Test cases with no transitions are subgraphs
 			cull[n]=true;
 		}
+		int index=0;
 		for(it=ts.begin(); !cull[n] && it!=ts.end(); ++it){		//Look for extended Test cases
-			if(((*it)->getSize()>=ts[n]->getSize()) && (*it)->contains(ts[n])){ 
+			if(((*it)->getSize()>=ts[n]->getSize()) && (*it)->contains(ts[n]) && !dom[n]){ 
+					dom[index]=true;
 					cull[n]=true; 
 			}
+			index++;
 		}
 	}
 	
 	for(int i=0; i<size; ++i){
-		if(!cull[i]){
+		if(dom[i] || !cull[i]){
 			result->addTestCase(ts[i]);
 		}
 	}
 
 	delete [] cull;
+	delete [] dom;
 
 	return result;
 }
@@ -423,3 +451,41 @@ vector<transitionPair*>* getTPairs(state **s, vector<transition*> *mt){
 	return tpairs;
 }
 
+void stressTest(int MAX_TESTS, int TEST_SIZE, vector<transitionPair*> *tp, state **s){
+	cout<<"----------------------------------------\n";
+	cout<<"Stress test results for "<<MAX_TESTS<<" test cases:\n";
+	testCase *tc;
+	double total_time=0.0, pc_time=0-0, sc_time=0.0;  
+	time_t start, finish, reference;
+	time(&start);
+
+	testSet ts=testSet();
+	for(int i=0; i<MAX_TESTS; ++i){
+		tc=new testCase(i,TEST_SIZE,s);
+		ts.addTestCase(tc);
+	}
+
+	//PriorityCull
+	time(&reference);
+	testSet *pc=ts.priorityCull(tp);
+	time(&finish);
+	pc_time=difftime(finish,reference);
+	cout<<pc->getSize()<<endl;
+
+	//SubgraphCull
+	time(&reference);
+	testSet *sc=ts.subgraphCull(tp,s);
+	time(&finish);
+	sc_time=difftime(finish,reference);
+	cout<<sc->getSize()<<endl;
+
+	//time(&finish);
+	total_time=difftime(finish,start);
+	cout<<"priorityCull time: "<<pc_time<<endl;
+	cout<<"subgraphCull time: "<<sc_time<<endl;
+	cout<<"Total time elapsed: "<<total_time<<endl;
+	cout<<"----------------------------------------\n";
+
+	delete pc;
+	delete sc;
+}

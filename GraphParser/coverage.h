@@ -11,6 +11,7 @@ class testCase{
 	vector<transition*> t;
 public:
 	testCase(int id, string name, string filename);
+	testCase(int id, int size, state **s);
 	int getId() const;
 	testCase& setId(int id);
 	string getFilename() const;
@@ -69,6 +70,6 @@ public:
 
 void parseTrace(string trace, state **s, testCase *tc);
 vector<transitionPair*>* getTPairs(state **s, vector<transition*> *mt);
-
+void stressTest(int MAX_TESTS, int TEST_SIZE, vector<transitionPair*> *tp, state **s);
 
 #endif

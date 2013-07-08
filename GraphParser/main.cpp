@@ -26,6 +26,7 @@ int main(){
 	cout<<"\t1 - Generate diagrams for the original test set\n";
 	cout<<"\t2 - Generate diagrams for the minimized test set using Priority Cull\n";
 	cout<<"\t3 - Generate diagrams for the minimized test set using Subgraph Cull\n";
+	cout<<"\t4 - Perform Stress Test\n";
 	cout<<"\t0 - Exit application\n";
 	cout<<"---------------------------------------------\n";
 
@@ -33,6 +34,7 @@ int main(){
 	cin>>option;
 	float tpc=0;
 	bool *selectedTestCases=0;
+	int MAX_TESTS=0;
 	switch(option){
 	case 1:
 		ts.printTestSet(s,&t);
@@ -59,6 +61,12 @@ int main(){
 		cout<<"Transition-Pair Coverage: "<<tpc*100<<"%"<<endl;
 		selectedTestCases=extendSet->getSelectedCases(ts.getSize());
 		break;
+	case 4:
+		cout<<"Enter number of test cases: ";
+		cin>>MAX_TESTS;
+		stressTest(MAX_TESTS,10,tp,s);
+		system("pause");
+		return 0;
 	default:
 		break;
 	}
