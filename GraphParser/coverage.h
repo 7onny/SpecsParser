@@ -43,6 +43,7 @@ public:
 	testSet& prioritize(vector<transitionPair*> *tp);
 	testSet* priorityCull(vector<transitionPair*> *tp);
 	testSet* subgraphCull(vector<transitionPair*> *tp, state **s);
+	testSet* multiStageSubgraphCull(vector<transitionPair*> *tp, state **s);
 	void printTestSet(state **s, vector<transition*> *t);
 	bool* getSelectedCases(int n);
 };

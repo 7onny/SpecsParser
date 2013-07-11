@@ -1,3 +1,3 @@
 Set objShell = CreateObject("Wscript.Shell")
 objShell.CurrentDirectory = "C:\Users\Jonny\Projects\GraphParser\GraphParser\wd"
-objShell.run "cmd /K dot -Tbmp diagram.dot > diagram.bmp & dot -Tbmp CEdiagram13.dot > CEdiagram13.bmp &  dot -Tbmp CEdiagram14.dot > CEdiagram14.bmp &  dot -Tbmp CEdiagram17.dot > CEdiagram17.bmp &  dot -Tbmp CEdiagram18.dot > CEdiagram18.bmp &  dot -Tbmp CEdiagram20.dot > CEdiagram20.bmp & exit"
+objShell.run "cmd /K dot -Tbmp diagram.dot > diagram.bmp & dot -Tbmp CEdiagram10.dot > CEdiagram10.bmp &  dot -Tbmp CEdiagram12.dot > CEdiagram12.bmp &  dot -Tbmp CEdiagram13.dot > CEdiagram13.bmp &  dot -Tbmp CEdiagram14.dot > CEdiagram14.bmp &  dot -Tbmp CEdiagram17.dot > CEdiagram17.bmp &  dot -Tbmp CEdiagram18.dot > CEdiagram18.bmp &  dot -Tbmp CEdiagram19.dot > CEdiagram19.bmp &  dot -Tbmp CEdiagram20.dot > CEdiagram20.bmp & exit"

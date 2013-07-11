@@ -130,7 +130,7 @@ float testCase::computeTPairCoverage(vector<transitionPair*> *tp){
 bool testCase::contains(testCase *contained){
 	//Checks whether or not testCase "contained" is included in (*this)
 	if(contained->t.empty()) return false;
-	if(t.size()>contained->t.size()) return false;
+	if(t.size()<contained->t.size()) return false;
 	if(id==contained->id) return false;
 
 	bool start_found=false;
@@ -146,8 +146,10 @@ bool testCase::contains(testCase *contained){
 		//Any other case: Looking for root or next node in sequence
 		++j;
 	}
-	//Sequence was found in *this and not broken
-	return true;
+	if(start_found)	//Sequence was found in *this and not broken
+		return true;
+	else			//Root was not found
+		return false;
 }
 bool testCase::operator<(testCase *contained){
 	return this->contains(contained);
@@ -292,7 +294,7 @@ testSet* testSet::subgraphCull(vector<transitionPair*> *tp, state **s){
 		}
 		int index=0;
 		for(it=ts.begin(); !cull[n] && it!=ts.end(); ++it){		//Look for extended Test cases
-			if(((*it)->getSize()>=ts[n]->getSize()) && (*it)->contains(ts[n]) && !dom[n]){ 
+			if((*it)->contains(ts[n]) && !dom[n]){ 
 					dom[index]=true;
 					cull[n]=true; 
 			}
@@ -308,6 +310,84 @@ testSet* testSet::subgraphCull(vector<transitionPair*> *tp, state **s){
 
 	delete [] cull;
 	delete [] dom;
+
+	return result;
+}
+testSet* testSet::multiStageSubgraphCull(vector<transitionPair*> *tp, state **s){
+	testSet *result=new testSet();
+	int const size=ts.size();
+	bool repeat=true;
+	float coverage=computeTPairCoverage(tp);
+	if(coverage<1.0 && (computeStateCoverage(s)<1.0)){
+		//If we don't have state coverage we can't assume that testCases with no 
+		//transitions are subgraphs trivially and must abort the operation
+		return result;
+	}
+
+	int *dom_count=new int[size];
+	bool *cull=new bool[size], *dom=new bool[size], *mask=new bool[size];
+	for(int i=0; i<size; ++i)	
+		mask[i]=true;
+
+	vector<testCase*>::iterator it;
+	while(repeat){
+		//Initialize for the iteration
+		for(int i=0; i<size; ++i) {
+			if(mask[i]){
+				cull[i]=false;
+				dom[i]=false;
+				dom_count[i]=0;
+			}
+		}
+		//Begin subgraph cull
+		for(int n=size-1; n>0; --n){
+			if((ts[n])->getSize()==0){		//Test cases with no transitions are subgraphs
+				cull[n]=true;
+			}
+			int index=0;
+			for(it=ts.begin(); it!=ts.end(); ++it){		//Look for extended Test cases
+				if((mask[index] && mask[n]) && (*it)->contains(ts[n]) && !dom[n]){
+					if(!cull[n]){
+						dom[index]=true;
+						cull[n]=true; 
+					}
+					//In any case, add a dom count
+					dom_count[index]+=1;
+				}
+				index++;
+			}
+		}
+		//Check for further subgraphs
+		int k=0;
+		for(int i=0; i<size; ++i)
+			if(mask[i] && dom_count[i]>k)
+				k=dom_count[i];
+		cout<<"k="<<k<<endl;
+
+		//Check for end
+		if(k<2)
+			repeat=false;
+
+		//Mask out finished cases
+		if(repeat){
+			for(int i=0; i<size; ++i)
+				if(!dom[i])
+					mask[i]=false;
+		}
+
+	}
+
+
+	for(int i=0; i<size; ++i){
+		if(dom[i] || !cull[i]){
+			result->addTestCase(ts[i]);
+		}
+	}
+
+	delete [] cull;
+	delete [] dom;
+	delete [] mask;
+	delete [] dom_count;
 
 	return result;
 }
@@ -455,7 +535,7 @@ void stressTest(int MAX_TESTS, int TEST_SIZE, vector<transitionPair*> *tp, state
 	cout<<"----------------------------------------\n";
 	cout<<"Stress test results for "<<MAX_TESTS<<" test cases:\n";
 	testCase *tc;
-	double total_time=0.0, pc_time=0-0, sc_time=0.0;  
+	double total_time=0.0, pc_time=0-0, sc_time=0.0, msc_time=0.0;    
 	time_t start, finish, reference;
 	time(&start);
 
@@ -479,13 +559,22 @@ void stressTest(int MAX_TESTS, int TEST_SIZE, vector<transitionPair*> *tp, state
 	sc_time=difftime(finish,reference);
 	cout<<sc->getSize()<<endl;
 
+	//Multi-Stage SubgraphCull
+	time(&reference);
+	testSet *msc=ts.subgraphCull(tp,s);
+	time(&finish);
+	msc_time=difftime(finish,reference);
+	cout<<msc->getSize()<<endl;
+
 	//time(&finish);
 	total_time=difftime(finish,start);
 	cout<<"priorityCull time: "<<pc_time<<endl;
 	cout<<"subgraphCull time: "<<sc_time<<endl;
+	cout<<"multisubgraphCull time: "<<msc_time<<endl;
 	cout<<"Total time elapsed: "<<total_time<<endl;
 	cout<<"----------------------------------------\n";
 
 	delete pc;
 	delete sc;
+	delete msc;
 }

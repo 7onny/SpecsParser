@@ -8,7 +8,7 @@ int main(){
 	cout<<"Allocating memory"<<endl;
 	state** s = setUpStates();
 	vector<transition*> t;
-	testSet ts, *prioSet=0, *extendSet=0;
+	testSet ts, *prioSet=0, *extendSet=0, *multiextendSet=0;
 
 	if(!clearWD()){
 		cerr<<"Error preping up WD\n";
@@ -26,7 +26,8 @@ int main(){
 	cout<<"\t1 - Generate diagrams for the original test set\n";
 	cout<<"\t2 - Generate diagrams for the minimized test set using Priority Cull\n";
 	cout<<"\t3 - Generate diagrams for the minimized test set using Subgraph Cull\n";
-	cout<<"\t4 - Perform Stress Test\n";
+	cout<<"\t4 - Generate diagrams for the minimized test set using Multi-Stage Subgraph Cull\n";
+	cout<<"\t9 - Perform Stress Test\n";
 	cout<<"\t0 - Exit application\n";
 	cout<<"---------------------------------------------\n";
 
@@ -42,6 +43,8 @@ int main(){
 		tpc=ts.computeTPairCoverage(tp);
 		cout<<"Transition-Pair Coverage: "<<tpc*100<<"%"<<endl;
 		selectedTestCases=ts.getSelectedCases(ts.getSize());
+		createScript(selectedTestCases, ts.getSize(), string(SCRIPT));
+		cout<<"---------------------------------------------\nJob Done.\n";
 		break;
 	case 2:
 		prioSet=ts.priorityCull(tp);
@@ -51,6 +54,8 @@ int main(){
 		tpc=prioSet->computeTPairCoverage(tp);
 		cout<<"Transition-Pair Coverage: "<<tpc*100<<"%"<<endl;
 		selectedTestCases=prioSet->getSelectedCases(ts.getSize());
+		createScript(selectedTestCases, ts.getSize(), string(SCRIPT));
+		cout<<"---------------------------------------------\nJob Done.\n";
 		break;
 	case 3:
 		extendSet=ts.subgraphCull(tp,s);
@@ -60,19 +65,28 @@ int main(){
 		tpc=extendSet->computeTPairCoverage(tp);
 		cout<<"Transition-Pair Coverage: "<<tpc*100<<"%"<<endl;
 		selectedTestCases=extendSet->getSelectedCases(ts.getSize());
+		createScript(selectedTestCases, ts.getSize(), string(SCRIPT));
+		cout<<"---------------------------------------------\nJob Done.\n";
 		break;
 	case 4:
+		multiextendSet=ts.multiStageSubgraphCull(tp,s);
+		multiextendSet->printTestSet(s,&t);
+		cout<<"Original Test set size: "<<ts.getSize()<<endl;
+		cout<<"Final Test set size: "<<multiextendSet->getSize()<<endl;
+		tpc=multiextendSet->computeTPairCoverage(tp);
+		cout<<"Transition-Pair Coverage: "<<tpc*100<<"%"<<endl;
+		selectedTestCases=multiextendSet->getSelectedCases(ts.getSize());
+		createScript(selectedTestCases, ts.getSize(), string(SCRIPT));
+		cout<<"---------------------------------------------\nJob Done.\n";
+		break;
+	case 9:
 		cout<<"Enter number of test cases: ";
 		cin>>MAX_TESTS;
 		stressTest(MAX_TESTS,10,tp,s);
-		system("pause");
-		return 0;
+		break;
 	default:
 		break;
 	}
-
-	createScript(selectedTestCases, ts.getSize(), string(SCRIPT));
-	cout<<"---------------------------------------------\nJob Done.\n";
 	
 	cout<<"Freeing memory.."<<endl;
 	tp->clear();
