@@ -136,6 +136,7 @@ bool testCase::contains(testCase *contained){
 	bool start_found=false;
 	vector<transition*>::iterator i, j;
 	j=contained->t.begin();
+	int check=0;
 	for(i=t.begin(); i!=t.end(), j!=contained->t.end(); ++i){
 		if(start_found && !((**i)==(*j))){	//Sequence broken
 			return false;
@@ -145,6 +146,7 @@ bool testCase::contains(testCase *contained){
 		}
 		//Any other case: Looking for root or next node in sequence
 		++j;
+		check++;
 	}
 	if(start_found)	//Sequence was found in *this and not broken
 		return true;
@@ -545,36 +547,38 @@ void stressTest(int MAX_TESTS, int TEST_SIZE, vector<transitionPair*> *tp, state
 		ts.addTestCase(tc);
 	}
 
+	testSet *pc=0, *sc=0, *msc=0;
+
 	//PriorityCull
-	time(&reference);
-	testSet *pc=ts.priorityCull(tp);
-	time(&finish);
-	pc_time=difftime(finish,reference);
-	cout<<pc->getSize()<<endl;
+	//time(&reference);
+	//pc=ts.priorityCull(tp);
+	//time(&finish);
+	//pc_time=difftime(finish,reference);
+	//cout<<pc->getSize()<<endl;
 
 	//SubgraphCull
 	time(&reference);
-	testSet *sc=ts.subgraphCull(tp,s);
+	sc=ts.subgraphCull(tp,s);
 	time(&finish);
 	sc_time=difftime(finish,reference);
 	cout<<sc->getSize()<<endl;
 
 	//Multi-Stage SubgraphCull
-	time(&reference);
-	testSet *msc=ts.subgraphCull(tp,s);
-	time(&finish);
-	msc_time=difftime(finish,reference);
-	cout<<msc->getSize()<<endl;
+	//time(&reference);
+	//msc=ts.subgraphCull(tp,s);
+	//time(&finish);
+	//msc_time=difftime(finish,reference);
+	//cout<<msc->getSize()<<endl;
 
 	//time(&finish);
 	total_time=difftime(finish,start);
 	cout<<"priorityCull time: "<<pc_time<<endl;
 	cout<<"subgraphCull time: "<<sc_time<<endl;
-	cout<<"multisubgraphCull time: "<<msc_time<<endl;
+	//cout<<"multisubgraphCull time: "<<msc_time<<endl;
 	cout<<"Total time elapsed: "<<total_time<<endl;
 	cout<<"----------------------------------------\n";
 
-	delete pc;
-	delete sc;
-	delete msc;
+	if(pc) delete pc;
+	if(sc) delete sc;
+	if(msc) delete msc;
 }
